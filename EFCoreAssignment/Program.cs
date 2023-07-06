@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using EFCoreAssignment;
+using EFCoreAssignment.Entities;
 using Microsoft.EntityFrameworkCore;
 
 Console.WriteLine("Hello, World!");
@@ -19,6 +20,11 @@ SingleOrDefault(dbContext);
 LoadingRelatedData_Manual(dbContext);
 LoadingRelatedData_ExplicitLoading(dbContext);
 LoadingRelatedData_EagerLoading(dbContext);
+InsertProduct(dbContext);
+InsertProductWithNewShop(dbContext);
+UpdateProduct(dbContext);
+DeleteProduct(dbContext);
+DeleteProductByKey(dbContext);
 
 static void Filtering(AppDbContext dbContext)
 {
@@ -71,5 +77,77 @@ static void LoadingRelatedData_EagerLoading(AppDbContext dbContext)
                     .FirstOrDefault();
 }
 
+static void InsertProduct(AppDbContext dbContext)
+{
+    // TODO: Insert a new Product
+    var product = new Product
+    {
+        Name = "Mouse Pad",
+        ShopId = 2
+    };
+
+    dbContext.Add(product);
+    dbContext.SaveChanges();
+}
+
+static void InsertProductWithNewShop(AppDbContext dbContext)
+{
+    // TODO: Insert a new Product with a new Shop
+    var shop = new Shop
+    {
+        Name = "Instagram"
+    };
+
+    var product = new Product
+    {
+        Name = "Charger",
+        Shop = shop
+    };
+
+    dbContext.Add(product);
+    dbContext.SaveChanges();
+}
+
+static void UpdateProduct(AppDbContext dbContext)
+{
+    // TODO: Update a Product
+    var productId = 5;
+
+    var product = dbContext.Products
+        .Include(p => p.Reviews)
+        .Single(p => p.Id == productId);
+
+    var review = new Review
+    {
+        ReviewerName = "Santa Cruz",
+        Comment = "Super Big!",
+        NumberOfStars = 5,
+    };
+
+    product.Reviews.Add(review);
+    dbContext.SaveChanges();
+}
+
+static void DeleteProduct(AppDbContext dbContext)
+{
+    // TODO: Delete a Product
+    var productId = 2;
+    
+    var product = dbContext.Products.Single(p => p.Id == productId);
+
+    dbContext.Remove(product);
+    dbContext.SaveChanges();
+}
+
+static void DeleteProductByKey(AppDbContext dbContext)
+{
+    // TODO: Delete a Product with just having a key
+    var productId = 3;
+
+    var product = new Product { Id = productId };
+
+    dbContext.Remove(product);
+    dbContext.SaveChanges();
+}
 
 Console.WriteLine("EF Core is the best");
