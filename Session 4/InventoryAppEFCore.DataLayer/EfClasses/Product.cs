@@ -21,8 +21,11 @@ namespace InventoryAppEFCore.DataLayer.EfClasses
         public ICollection<Review> Reviews { get; set; }
         public ICollection<Tag> Tags { get; set; }
 
-        public ICollection<Supplier> SuppliersLink { get; set; }
+        public ICollection<ProductSupplier> SuppliersLink { get; set; }
 
         public bool IsDeleted { get; set; }
+        public int LineItemId { get; set; }
+        public LineItem LineItems { get; set; }
+
     }
 }

@@ -21,5 +21,7 @@ namespace InventoryAppEFCore.DataLayer.EfClasses
         public OrderStatus Status { get; set; }
 
         public int ClientId { get; set; }
+        public int LineItemId { get; set; }
+
     }
 }
