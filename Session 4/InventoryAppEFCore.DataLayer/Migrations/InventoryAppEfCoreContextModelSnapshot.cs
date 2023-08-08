@@ -65,10 +65,6 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
                     b.HasKey("LineItemId");
 
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
                     b.ToTable("LineItem");
                 });
 
@@ -85,6 +81,9 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
                     b.Property<DateTime>("DateOrderedUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("LineItemId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -134,14 +133,43 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("LineItemId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("SupplierId")
+                        .HasColumnType("int");
+
                     b.HasKey("ProductId");
 
+                    b.HasIndex("LineItemId")
+                        .IsUnique();
+
+                    b.HasIndex("SupplierId");
+
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.ProductSupplier", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Order")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("ProductId", "SupplierId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("ProductSupplier");
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Review", b =>
@@ -206,19 +234,19 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("ProductSupplier", b =>
+            modelBuilder.Entity("LineItemOrder", b =>
                 {
-                    b.Property<int>("ProductsLinkProductId")
+                    b.Property<int>("LineItemsLineItemId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SuppliersLinkSupplierId")
+                    b.Property<int>("OrdersOrderId")
                         .HasColumnType("int");
 
-                    b.HasKey("ProductsLinkProductId", "SuppliersLinkSupplierId");
+                    b.HasKey("LineItemsLineItemId", "OrdersOrderId");
 
-                    b.HasIndex("SuppliersLinkSupplierId");
+                    b.HasIndex("OrdersOrderId");
 
-                    b.ToTable("ProductSupplier");
+                    b.ToTable("LineItemOrder");
                 });
 
             modelBuilder.Entity("ProductTag", b =>
@@ -236,23 +264,6 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("ProductTag");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.LineItem", b =>
-                {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Order", null)
-                        .WithMany("LineItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", "SelectedProduct")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SelectedProduct");
-                });
-
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.PriceOffer", b =>
                 {
                     b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", null)
@@ -260,6 +271,40 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         .HasForeignKey("InventoryAppEFCore.DataLayer.EfClasses.PriceOffer", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Product", b =>
+                {
+                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.LineItem", "LineItems")
+                        .WithOne("SelectedProduct")
+                        .HasForeignKey("InventoryAppEFCore.DataLayer.EfClasses.Product", "LineItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Supplier", null)
+                        .WithMany("ProductsLink")
+                        .HasForeignKey("SupplierId");
+
+                    b.Navigation("LineItems");
+                });
+
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.ProductSupplier", b =>
+                {
+                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", "Product")
+                        .WithMany("SuppliersLink")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Review", b =>
@@ -271,17 +316,17 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProductSupplier", b =>
+            modelBuilder.Entity("LineItemOrder", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.LineItem", null)
                         .WithMany()
-                        .HasForeignKey("ProductsLinkProductId")
+                        .HasForeignKey("LineItemsLineItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Supplier", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Order", null)
                         .WithMany()
-                        .HasForeignKey("SuppliersLinkSupplierId")
+                        .HasForeignKey("OrdersOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -301,9 +346,10 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Order", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.LineItem", b =>
                 {
-                    b.Navigation("LineItems");
+                    b.Navigation("SelectedProduct")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Product", b =>
@@ -312,6 +358,13 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("SuppliersLink");
+                });
+
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Supplier", b =>
+                {
+                    b.Navigation("ProductsLink");
                 });
 #pragma warning restore 612, 618
         }
