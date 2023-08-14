@@ -1,4 +1,4 @@
-﻿namespace InventoryAppEFCore.DataLayer.EfClasses
+﻿namespace InventoryAppEFCore.DataLayer.Models.Entities
 {
     public class ProductSupplier
     {

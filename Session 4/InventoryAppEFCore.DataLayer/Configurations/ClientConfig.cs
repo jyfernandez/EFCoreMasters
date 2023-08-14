@@ -1,4 +1,4 @@
-﻿using InventoryAppEFCore.DataLayer.EfClasses;
+﻿using InventoryAppEFCore.DataLayer.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -18,6 +18,8 @@ namespace InventoryAppEFCore.DataLayer.Configurations
             builder.Property(c => c.Name)
            .HasMaxLength(50)
            .IsRequired();
+
+            builder.HasQueryFilter(x => !x.IsDeleted);
         }
     }
 }

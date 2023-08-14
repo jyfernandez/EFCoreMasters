@@ -22,7 +22,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Client", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Client", b =>
                 {
                     b.Property<int>("ClientId")
                         .ValueGeneratedOnAdd()
@@ -43,7 +43,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.LineItem", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.LineItem", b =>
                 {
                     b.Property<int>("LineItemId")
                         .ValueGeneratedOnAdd()
@@ -68,7 +68,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("LineItem");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Order", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Order", b =>
                 {
                     b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
@@ -93,7 +93,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.PriceOffer", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.PriceOffer", b =>
                 {
                     b.Property<int>("PriceOfferId")
                         .ValueGeneratedOnAdd()
@@ -119,7 +119,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("PriceOffers");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Product", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Product", b =>
                 {
                     b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
@@ -154,7 +154,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.ProductSupplier", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.ProductSupplier", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -172,7 +172,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("ProductSupplier");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Review", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Review", b =>
                 {
                     b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
@@ -202,7 +202,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Supplier", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Supplier", b =>
                 {
                     b.Property<int>("SupplierId")
                         .ValueGeneratedOnAdd()
@@ -224,7 +224,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("Suppliers");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Tag", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Tag", b =>
                 {
                     b.Property<string>("TagId")
                         .HasColumnType("nvarchar(450)");
@@ -264,39 +264,39 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("ProductTag");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.PriceOffer", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.PriceOffer", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Product", null)
                         .WithOne("Promotion")
-                        .HasForeignKey("InventoryAppEFCore.DataLayer.EfClasses.PriceOffer", "ProductId")
+                        .HasForeignKey("InventoryAppEFCore.DataLayer.Models.Entities.PriceOffer", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Product", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Product", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.LineItem", "LineItems")
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.LineItem", "LineItems")
                         .WithOne("SelectedProduct")
-                        .HasForeignKey("InventoryAppEFCore.DataLayer.EfClasses.Product", "LineItemId")
+                        .HasForeignKey("InventoryAppEFCore.DataLayer.Models.Entities.Product", "LineItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Supplier", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Supplier", null)
                         .WithMany("ProductsLink")
                         .HasForeignKey("SupplierId");
 
                     b.Navigation("LineItems");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.ProductSupplier", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.ProductSupplier", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", "Product")
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Product", "Product")
                         .WithMany("SuppliersLink")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Supplier", "Supplier")
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -307,9 +307,9 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Review", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Review", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Product", null)
                         .WithMany("Reviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -318,13 +318,13 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
             modelBuilder.Entity("LineItemOrder", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.LineItem", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.LineItem", null)
                         .WithMany()
                         .HasForeignKey("LineItemsLineItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Order", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Order", null)
                         .WithMany()
                         .HasForeignKey("OrdersOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -333,26 +333,26 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
             modelBuilder.Entity("ProductTag", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Product", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductsProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InventoryAppEFCore.DataLayer.EfClasses.Tag", null)
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsTagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.LineItem", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.LineItem", b =>
                 {
                     b.Navigation("SelectedProduct")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Product", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Product", b =>
                 {
                     b.Navigation("Promotion")
                         .IsRequired();
@@ -362,7 +362,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.Navigation("SuppliersLink");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.EfClasses.Supplier", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Supplier", b =>
                 {
                     b.Navigation("ProductsLink");
                 });
