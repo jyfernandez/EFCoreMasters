@@ -1,5 +1,5 @@
 ﻿using InventoryAppEFCore.DataLayer.Configurations;
-using InventoryAppEFCore.DataLayer.EfClasses;
+using InventoryAppEFCore.DataLayer.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

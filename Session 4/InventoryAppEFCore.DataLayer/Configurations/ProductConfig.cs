@@ -1,4 +1,4 @@
-﻿using InventoryAppEFCore.DataLayer.EfClasses;
+﻿using InventoryAppEFCore.DataLayer.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -23,6 +23,8 @@ namespace InventoryAppEFCore.DataLayer.Configurations
 
             builder.HasMany(l => l.Tags)
             .WithMany(l => l.Products);
+
+            builder.HasQueryFilter(x => !x.IsDeleted);
         }
     }
 }
