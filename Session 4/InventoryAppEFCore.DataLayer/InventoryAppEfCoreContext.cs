@@ -2,6 +2,7 @@
 using InventoryAppEFCore.DataLayer.Models.Entities;
 using InventoryAppEFCore.DataLayer.Views;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace InventoryAppEFCore.DataLayer
 {
@@ -51,6 +52,85 @@ namespace InventoryAppEFCore.DataLayer
                new { SupplierId = 6, Name = "Carousel", Description = "Carousel Supplier" }
             );
 
+            modelBuilder.Entity<Client>().HasData(
+             new
+             {
+                ClientId = 1,
+                Name = "John Doe"
+             }
+            );
+
+            modelBuilder.Entity<Order>().HasData(
+             new
+             {
+                 OrderId = 1,
+                 DateOrderedUtc = new DateTime(),
+                 ClientId = 1,
+                 LineItemId = 1,
+                 Status = OrderStatus.Complete,
+             }
+            );
+            modelBuilder.Entity<LineItem>().HasData(
+             new 
+             { 
+                 LineItemId = 1, 
+                 NumOfProducts = (short) 3, 
+                 ProductPrice = 100M, 
+                 OrderId = 1,
+                 ProductId = 1
+             }
+            );
+
+            modelBuilder.Entity<Product>().HasData(
+              new 
+              { 
+                  ProductId = 1, 
+                  Name = "Bag", 
+                  LineItemId = 1,
+                  PriceOffer = 1
+              },
+              new 
+              { 
+                  ProductId = 2, 
+                  Name = "Shoes",
+                  LineItemId = 1,
+                  PriceOffer = 2
+              },
+              new 
+              { 
+                  ProductId = 3,
+                  Name = "Shirt",
+                  LineItemId = 1,
+                  PriceOffer = 3
+              }
+            );
+
+            modelBuilder.Entity<PriceOffer>().HasData(
+              new 
+              {
+                  PriceOfferId = 1,
+                  NewPrice = 100M,
+                  PromotinalText = "10% Off",
+                  ProductId = 1,
+                  Currency = "Php"
+              },
+              new
+              {
+                  PriceOfferId = 2,
+                  NewPrice = 200M,
+                  PromotinalText = "20% Off",
+                  ProductId = 2,
+                  Currency = "Php"
+              },
+              new
+              {
+                  PriceOfferId = 3,
+                  NewPrice = 150M,
+                  PromotinalText = "30% Off",
+                  ProductId = 3,
+                  Currency = "Php"
+              }
+            );
         }
 
     }

@@ -10,6 +10,11 @@ namespace InventoryAppEFCore.DataLayer.Models.Entities
 
         public decimal NewPrice { get; set; }
         public string PromotinalText { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public bool IsDeleted { get; set; }
+
+        public string NewPriceText { get; set; }
+        public string Currency { get; set; }
 
         //relationship---
         [ForeignKey(nameof(Product))]

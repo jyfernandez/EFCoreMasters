@@ -23,6 +23,8 @@ var mapperConfig = new MapperConfiguration(cfg =>
 builder.Services.AddDbContext<InventoryAppEfCoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddTransient<InventoryAppEFCoreContextInitializer, InventoryAppEFCoreContextInitializer>();
+
 builder.Services.AddScoped<IInventoryAppService, InventoryAppService>();
 
 var app = builder.Build();
@@ -32,6 +34,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var dbContextInitialiser = services.GetRequiredService<InventoryAppEFCoreContextInitializer>();
+
+        await dbContextInitialiser.InitialiseAsync();
+        dbContextInitialiser.InitializeUDF();
+    }
 }
 
 app.UseHttpsRedirection();

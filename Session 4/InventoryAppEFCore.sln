@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryAppEFCore.DataLaye
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryAppEFCore.API", "InventoryAppEFCore.API\InventoryAppEFCore.API.csproj", "{B1EF30FC-BB54-40C4-AC3A-EA6D1ED3A01C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryAppEFCore.Services", "InventoryAppEFCore.Services\InventoryAppEFCore.Services.csproj", "{E4BD98FA-C8D0-4451-9E7B-86DE2EDB9996}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InventoryAppEFCore.Services", "InventoryAppEFCore.Services\InventoryAppEFCore.Services.csproj", "{E4BD98FA-C8D0-4451-9E7B-86DE2EDB9996}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

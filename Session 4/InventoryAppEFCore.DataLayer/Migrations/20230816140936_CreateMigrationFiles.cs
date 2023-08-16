@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace InventoryAppEFCore.DataLayer.Migrations
 {
-    public partial class InitializeDB : Migration
+    public partial class CreateMigrationFiles : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,7 +16,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     ClientId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -40,19 +40,22 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
+                name: "PriceOffers",
                 columns: table => new
                 {
-                    OrderId = table.Column<int>(type: "int", nullable: false)
+                    PriceOfferId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DateOrderedUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    LineItemId = table.Column<int>(type: "int", nullable: false)
+                    NewPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PromotinalText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    NewPriceText = table.Column<string>(type: "nvarchar(max)", nullable: false, computedColumnSql: "[Currency] + ',' + CAST([NewPrice] AS NVARCHAR(255))", stored: true),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.OrderId);
+                    table.PrimaryKey("PK_PriceOffers", x => x.PriceOfferId);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,6 +84,62 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DateOrderedUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    LineItemId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_Orders_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    PriceOffer = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    LineItemId = table.Column<int>(type: "int", nullable: false),
+                    SupplierId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.ProductId);
+                    table.ForeignKey(
+                        name: "FK_Products_LineItem_LineItemId",
+                        column: x => x.LineItemId,
+                        principalTable: "LineItem",
+                        principalColumn: "LineItemId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Products_PriceOffers_PriceOffer",
+                        column: x => x.PriceOffer,
+                        principalTable: "PriceOffers",
+                        principalColumn: "PriceOfferId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Products_Suppliers_SupplierId",
+                        column: x => x.SupplierId,
+                        principalTable: "Suppliers",
+                        principalColumn: "SupplierId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LineItemOrder",
                 columns: table => new
                 {
@@ -101,55 +160,6 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         column: x => x.OrdersOrderId,
                         principalTable: "Orders",
                         principalColumn: "OrderId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    ProductId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    LineItemId = table.Column<int>(type: "int", nullable: false),
-                    DateDeleted = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SupplierId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.ProductId);
-                    table.ForeignKey(
-                        name: "FK_Products_LineItem_LineItemId",
-                        column: x => x.LineItemId,
-                        principalTable: "LineItem",
-                        principalColumn: "LineItemId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Products_Suppliers_SupplierId",
-                        column: x => x.SupplierId,
-                        principalTable: "Suppliers",
-                        principalColumn: "SupplierId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PriceOffers",
-                columns: table => new
-                {
-                    PriceOfferId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    NewPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PromotinalText = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PriceOffers", x => x.PriceOfferId);
-                    table.ForeignKey(
-                        name: "FK_PriceOffers_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -224,15 +234,58 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Clients",
+                columns: new[] { "ClientId", "Name" },
+                values: new object[] { 1, "John Doe" });
+
+            migrationBuilder.InsertData(
+                table: "LineItem",
+                columns: new[] { "LineItemId", "NumOfProducts", "OrderId", "ProductId", "ProductPrice" },
+                values: new object[] { 1, (short)3, 1, 1, 100m });
+
+            migrationBuilder.InsertData(
+                table: "PriceOffers",
+                columns: new[] { "PriceOfferId", "Currency", "NewPrice", "ProductId", "PromotinalText" },
+                values: new object[,]
+                {
+                    { 1, "Php", 100m, 1, "10% Off" },
+                    { 2, "Php", 200m, 2, "20% Off" },
+                    { 3, "Php", 150m, 3, "30% Off" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Suppliers",
+                columns: new[] { "SupplierId", "Description", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Shoppee Supplier", "Shoppee" },
+                    { 2, "Lazada Supplier", "Lazada" },
+                    { 3, "Tiktok Supplier", "Tiktok" },
+                    { 4, "Marketplace Supplier", "Marketplace" },
+                    { 5, "Instagram Supplier", "Instagram" },
+                    { 6, "Carousel Supplier", "Carousel" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Orders",
+                columns: new[] { "OrderId", "ClientId", "DateOrderedUtc", "LineItemId", "Status" },
+                values: new object[] { 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 3 });
+
+            migrationBuilder.InsertData(
+                table: "Products",
+                columns: new[] { "ProductId", "LineItemId", "Name", "PriceOffer", "SupplierId" },
+                values: new object[] { 3, 1, "Shirt", 3, null });
+
             migrationBuilder.CreateIndex(
                 name: "IX_LineItemOrder_OrdersOrderId",
                 table: "LineItemOrder",
                 column: "OrdersOrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PriceOffers_ProductId",
-                table: "PriceOffers",
-                column: "ProductId",
+                name: "IX_Orders_ClientId",
+                table: "Orders",
+                column: "ClientId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -240,6 +293,11 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                 table: "Products",
                 column: "LineItemId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_PriceOffer",
+                table: "Products",
+                column: "PriceOffer");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_SupplierId",
@@ -265,13 +323,7 @@ namespace InventoryAppEFCore.DataLayer.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Clients");
-
-            migrationBuilder.DropTable(
                 name: "LineItemOrder");
-
-            migrationBuilder.DropTable(
-                name: "PriceOffers");
 
             migrationBuilder.DropTable(
                 name: "ProductSupplier");
@@ -292,7 +344,13 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
+                name: "Clients");
+
+            migrationBuilder.DropTable(
                 name: "LineItem");
+
+            migrationBuilder.DropTable(
+                name: "PriceOffers");
 
             migrationBuilder.DropTable(
                 name: "Suppliers");
