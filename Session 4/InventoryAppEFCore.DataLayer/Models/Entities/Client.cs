@@ -11,6 +11,7 @@ namespace InventoryAppEFCore.DataLayer.Models.Entities
         public string Name { get; set; }
 
         public bool IsDeleted { get; set; }
+        public Order Order { get; set; }
 
     }
 }

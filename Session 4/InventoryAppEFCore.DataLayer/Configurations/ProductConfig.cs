@@ -19,10 +19,14 @@ namespace InventoryAppEFCore.DataLayer.Configurations
             .HasMaxLength(50)
             .IsRequired();
 
-            builder.Property<DateTime>("DateDeleted");
+            //builder.Property<DateTime>("DateDeleted");
 
             builder.HasMany(l => l.Tags)
             .WithMany(l => l.Products);
+
+            builder
+               .Property(c => c.IsDeleted)
+               .HasDefaultValue(false);
 
             builder.HasQueryFilter(x => !x.IsDeleted);
         }

@@ -22,6 +22,11 @@ namespace InventoryAppEFCore.DataLayer.Configurations
 
             builder.Property(o => o.DateOrderedUtc)
             .HasConversion(utcConverter);
+
+            builder.HasOne<Client>()
+                .WithOne(x => x.Order)
+                .HasForeignKey<Order>(x => x.ClientId)
+                .IsRequired();
         }
     }
 }

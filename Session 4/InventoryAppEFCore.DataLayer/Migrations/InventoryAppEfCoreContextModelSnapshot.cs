@@ -31,7 +31,9 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"), 1L, 1);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -41,6 +43,13 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.HasKey("ClientId");
 
                     b.ToTable("Clients");
+
+                    b.HasData(
+                        new
+                        {
+                            ClientId = 1,
+                            Name = "John Doe"
+                        });
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.LineItem", b =>
@@ -66,6 +75,16 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.HasKey("LineItemId");
 
                     b.ToTable("LineItem");
+
+                    b.HasData(
+                        new
+                        {
+                            LineItemId = 1,
+                            NumOfProducts = (short)3,
+                            OrderId = 1,
+                            ProductId = 1,
+                            ProductPrice = 100m
+                        });
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Order", b =>
@@ -90,7 +109,20 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
                     b.HasKey("OrderId");
 
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
                     b.ToTable("Orders");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderId = 1,
+                            ClientId = 1,
+                            DateOrderedUtc = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LineItemId = 1,
+                            Status = 3
+                        });
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.PriceOffer", b =>
@@ -101,8 +133,28 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PriceOfferId"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getutcdate()");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<decimal>("NewPrice")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("NewPriceText")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComputedColumnSql("[Currency] + ',' + CAST([NewPrice] AS NVARCHAR(255))", true);
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -113,10 +165,33 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
                     b.HasKey("PriceOfferId");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique();
-
                     b.ToTable("PriceOffers");
+
+                    b.HasData(
+                        new
+                        {
+                            PriceOfferId = 1,
+                            Currency = "Php",
+                            NewPrice = 100m,
+                            ProductId = 1,
+                            PromotinalText = "10% Off"
+                        },
+                        new
+                        {
+                            PriceOfferId = 2,
+                            Currency = "Php",
+                            NewPrice = 200m,
+                            ProductId = 2,
+                            PromotinalText = "20% Off"
+                        },
+                        new
+                        {
+                            PriceOfferId = 3,
+                            Currency = "Php",
+                            NewPrice = 150m,
+                            ProductId = 3,
+                            PromotinalText = "30% Off"
+                        });
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Product", b =>
@@ -127,11 +202,10 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"), 1L, 1);
 
-                    b.Property<DateTime>("DateDeleted")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("LineItemId")
                         .HasColumnType("int");
@@ -141,6 +215,9 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("PriceOffer")
+                        .HasColumnType("int");
+
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
 
@@ -149,9 +226,34 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.HasIndex("LineItemId")
                         .IsUnique();
 
+                    b.HasIndex("PriceOffer");
+
                     b.HasIndex("SupplierId");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductId = 1,
+                            LineItemId = 1,
+                            Name = "Bag",
+                            PriceOffer = 1
+                        },
+                        new
+                        {
+                            ProductId = 2,
+                            LineItemId = 1,
+                            Name = "Shoes",
+                            PriceOffer = 2
+                        },
+                        new
+                        {
+                            ProductId = 3,
+                            LineItemId = 1,
+                            Name = "Shirt",
+                            PriceOffer = 3
+                        });
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.ProductSupplier", b =>
@@ -322,11 +424,11 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                     b.ToTable("ProductTag");
                 });
 
-            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.PriceOffer", b =>
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Order", b =>
                 {
-                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Product", null)
-                        .WithOne("Promotion")
-                        .HasForeignKey("InventoryAppEFCore.DataLayer.Models.Entities.PriceOffer", "ProductId")
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Client", null)
+                        .WithOne("Order")
+                        .HasForeignKey("InventoryAppEFCore.DataLayer.Models.Entities.Order", "ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -339,11 +441,19 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.PriceOffer", "Promotion")
+                        .WithMany()
+                        .HasForeignKey("PriceOffer")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("InventoryAppEFCore.DataLayer.Models.Entities.Supplier", null)
                         .WithMany("ProductsLink")
                         .HasForeignKey("SupplierId");
 
                     b.Navigation("LineItems");
+
+                    b.Navigation("Promotion");
                 });
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.ProductSupplier", b =>
@@ -404,6 +514,12 @@ namespace InventoryAppEFCore.DataLayer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Client", b =>
+                {
+                    b.Navigation("Order")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.LineItem", b =>
                 {
                     b.Navigation("SelectedProduct")
@@ -412,9 +528,6 @@ namespace InventoryAppEFCore.DataLayer.Migrations
 
             modelBuilder.Entity("InventoryAppEFCore.DataLayer.Models.Entities.Product", b =>
                 {
-                    b.Navigation("Promotion")
-                        .IsRequired();
-
                     b.Navigation("Reviews");
 
                     b.Navigation("SuppliersLink");

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InventoryAppEFCore.DataLayer.Models.Entities
 {
@@ -11,6 +12,7 @@ namespace InventoryAppEFCore.DataLayer.Models.Entities
         public string Name { get; set; }
 
         //relationships---
+        [ForeignKey(nameof(PriceOffer))]
         public PriceOffer Promotion { get; set; }
         public ICollection<Review> Reviews { get; set; }
         public ICollection<Tag> Tags { get; set; }

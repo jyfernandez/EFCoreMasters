@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using InventoryAppEFCore.DataLayer.Models.Entities;
 using InventoryAppEFCore.DataLayer;
 using InventoryAppEFCore.Services.Interfaces;
 using AutoMapper.QueryableExtensions;
